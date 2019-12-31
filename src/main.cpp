@@ -1,6 +1,8 @@
 // Example by David PA7LIM
 // 
 #include <Arduino.h>
+#include <SD.h>
+#include <FS.h>
 #include <SPI.h>
 #include <Ethernet.h>
 #include "SH1106.h"
@@ -76,6 +78,25 @@ void setup() {
   digitalWrite(STAT_LED,1); // Turn on the STAT LED
 
   Serial.begin(9600); // debug information to serial
+
+  // SDcard
+  SPI.begin();
+  if (!SD.begin(SD_SELECT)){
+    Serial.println("No SD card found");
+  } else {
+    File file = SD.open("/NET.INI"); // read the textfile NET.INI from SDcard
+     if(!file){
+        Serial.println("Failed to open file for reading");
+        return;
+    }
+
+    Serial.print("Read from file: ");
+    while(file.available()){
+        Serial.write(file.read());
+    }
+    file.close();
+  }
+
 
   // EThernet 
   pinMode(ETHERNET_SELECT, OUTPUT);
